@@ -32,7 +32,7 @@ namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 			httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("de-DE", 1));
 			httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.HttpContext.Session.Get<string>("Token"));
 
-			var clientData = await httpClient.GetFromJsonAsync<ClientMinimalDataOutputModel>($"api/v1/users/{this.HttpContext.Session.Get<long>("ClientId")}");
+			var clientData = await httpClient.GetFromJsonAsync<ClientOutputModel>($"api/v1/users/{this.HttpContext.Session.Get<long>("ClientId")}");
 			var clientPortfolios = await httpClient.GetFromJsonAsync<IList<PortfolioOutputModel>>($"api/v1/user-portfolios/user-id/{this.HttpContext.Session.Get<long>("ClientId")}");
 
 			return this.View("/Views/Client/PortfoliosList.cshtml", new PortfoliosListViewModel
@@ -58,7 +58,7 @@ namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 			httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("de-DE", 1));
 			httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.HttpContext.Session.Get<string>("Token"));
 
-			var clientData = await httpClient.GetFromJsonAsync<ClientMinimalDataOutputModel>($"api/v1/users/{this.HttpContext.Session.Get<long>("ClientId")}");
+			var clientData = await httpClient.GetFromJsonAsync<ClientOutputModel>($"api/v1/users/{this.HttpContext.Session.Get<long>("ClientId")}");
 			var clientPortfolio = await httpClient.GetFromJsonAsync<PortfolioOutputModel>($"api/v1/user-portfolios/portfolio-id/{portfolioId}?portfolio-view-as=Snapshot");
 
 			var clientCockpitViewModels = new PortfolioDetailViewModel

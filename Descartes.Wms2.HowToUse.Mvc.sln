@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Descartes.Wms2.HowToUse.Mvc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Descartes.Wms2.HowToUse.Mvc.Shared.DTOs", "Descartes.Wms2.HowToUse.Mvc.Shared.DTOs\Descartes.Wms2.HowToUse.Mvc.Shared.DTOs.csproj", "{9B6CD49B-34DE-4A83-8A63-AB3F1026DA4F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 Client Creation", "01 Client Creation", "{4CF7C157-94C4-49C8-82B2-48339D444C21}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 Web App", "01 Web App", "{4CF7C157-94C4-49C8-82B2-48339D444C21}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00 Common", "00 Common", "{3D978AD5-D827-4396-A278-735A69940EB0}"
 EndProject

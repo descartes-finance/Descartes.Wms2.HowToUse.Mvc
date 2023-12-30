@@ -59,31 +59,31 @@ namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 			httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("de-DE", 1));
 			httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.HttpContext.Session.Get<string>("Token"));
 
-            // As the client agrees with the investments proposed, save his questionnaire: this will also set a risk profile.
-            var payload = JsonConvert.SerializeObject(new
-            {
-                BusinessLineId = this.HttpContext.Session.Get<long>("BusinessLineId"),
-                UserId = this.HttpContext.Session.Get<long>("ClientId"),
-                Responses = new[]
-                {
+			// As the client agrees with the investments proposed, save his questionnaire: this will also set a risk profile.
+			var payload = JsonConvert.SerializeObject(new
+			{
+				BusinessLineId = this.HttpContext.Session.Get<long>("BusinessLineId"),
+				UserId = this.HttpContext.Session.Get<long>("ClientId"),
+				Responses = new[]
+				{
 					new { ResponseId = this.HttpContext.Session.Get<long>("Response1Id") },
 					new { ResponseId = this.HttpContext.Session.Get<long>("Response2Id") },
 					new { ResponseId = this.HttpContext.Session.Get<long>("Response3Id") },
 					new { ResponseId = this.HttpContext.Session.Get<long>("Response4Id") }
 				}
-            });
+			});
 
-            _ = httpClient.PostAsync("api/v1/user-risk-categorizations", new StringContent(payload, Encoding.UTF8, "application/json")).Result;
+			_ = httpClient.PostAsync("api/v1/user-risk-categorizations", new StringContent(payload, Encoding.UTF8, "application/json")).Result;
 
-            // Order reservation and order submission
-            var reservationPayload = JsonConvert.SerializeObject(new { UserId = this.HttpContext.Session.Get<long>("ClientId"), InvestmentCategoryId = this.HttpContext.Session.Get<long>("InvestmentCategoryId") });
+			// Order reservation and order submission
+			var reservationPayload = JsonConvert.SerializeObject(new { UserId = this.HttpContext.Session.Get<long>("ClientId"), InvestmentCategoryId = this.HttpContext.Session.Get<long>("InvestmentCategoryId") });
 			var httpResponseMessage = httpClient.PostAsync("api/v1/user-portfolio-orders/reservation", new StringContent(reservationPayload, Encoding.UTF8, "application/json")).Result;
 			var reservationAsString = httpResponseMessage.Content.ReadAsStringAsync().Result;
 			var reservation = JsonConvert.DeserializeObject<ReservationOutputModel>(reservationAsString);
 
-            var accountHoldingInstitution = httpClient.GetFromJsonAsync<AccountHoldingInstitutionOutputModel>("api/v1/account-holding-institutions/code/LIENHARDT").Result;
+			var accountHoldingInstitution = httpClient.GetFromJsonAsync<AccountHoldingInstitutionOutputModel>("api/v1/account-holding-institutions/code/LIENHARDT").Result;
 
-            var orderPortfolioCreationInputModel = new
+			var orderPortfolioCreationInputModel = new
 			{
 				ReservationId = reservation.Id,
 				AccountHoldingInstitutionCode = accountHoldingInstitution.Code,
@@ -116,7 +116,7 @@ namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 					this.ViewData.Add("ApiError", errors);
 				}
 
-				return this.View("/Views/Order/Submit.cshtml");
+				return this.View("/Views/Order/PlanCreate.cshtml");
 			}
 			else
 			{
@@ -124,8 +124,32 @@ namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 				this.ViewData.Add("OrderId", UriHelper.GetIdFromLocationUri(httpResponseMessage.Headers.Location));
 				this.ViewData.Add("IBAN", reservation.Iban);
 
-				return this.View("/Views/Order/Submit.cshtml");
-			}			
+				return this.View("/Views/Order/PlanCreate.cshtml");
+			}
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> ProposalSelection(long portfolioId)
+		{
+			using var httpClient = new HttpClient { BaseAddress = new Uri(_configuration["WmsBaseUrl"]) };
+			httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json", 1));
+			httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("de-DE", 1));
+			httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.HttpContext.Session.Get<string>("Token"));
+
+			var clientPortfolio = await httpClient.GetFromJsonAsync<PortfolioOutputModel>($"api/v1/user-portfolios/portfolio-id/{portfolioId}?portfolio-view-as=Snapshot");
+
+			var url = $"api/v1/proposals/investment-category-id/{clientPortfolio.InvestmentCategoryId}";
+			var proposals = await httpClient.GetFromJsonAsync<List<ProposalOutputModel>>(url);
+			var alternativeProposals = proposals.Where(x => x.Id != clientPortfolio.ProposalId).ToList();
+
+			var planChangeProposalSelectionViewModel = new PlanChangeProposalSelectionViewModel
+			{
+				ClientId = this.HttpContext.Session.Get<long>("ClientId"),
+				PortfolioId = portfolioId,
+				Proposals = alternativeProposals
+			};
+
+			return this.View("/Views/Order/SelectProposal.cshtml");
 		}
 
 		#region Private Methods
