@@ -4,21 +4,21 @@
 
 @model PlanChangeProposalSelectionViewModel
 
-<form method="POST" action="">
+<form method="POST" action="Order/PlanChange">
 	@Html.HiddenFor(x => x.ClientId)
 	@Html.HiddenFor(x => x.PortfolioId)
 
 	<div class="text-center">
 		<div class="row">
 			<div class="col-12">
-				<select name="ProposalId">
+				New portfolio strategy: <select name="ProposalId">
 					@foreach (var proposal in this.Model.Proposals)
 					{
 						<option value="@proposal.Id">@proposal.Name</option>
 					}
 				</select>
 			</div>
-
+			<br /><br />
 			<div class="col-12">
 				<button type="submit" class="btn btn-primary">Prepare PDF</button>
 			</div>

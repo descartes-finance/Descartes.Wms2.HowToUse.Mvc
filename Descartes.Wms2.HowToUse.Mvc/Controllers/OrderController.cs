@@ -149,7 +149,61 @@ namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 				Proposals = alternativeProposals
 			};
 
-			return this.View("/Views/Order/SelectProposal.cshtml");
+			return this.View("/Views/Order/SelectProposal.cshtml", planChangeProposalSelectionViewModel);
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> PlanChange(PlanChangeProposalSelectionViewModel planChangeProposalSelectionViewModel)
+		{
+			using var httpClient = new HttpClient { BaseAddress = new Uri(_configuration["WmsBaseUrl"]) };
+			httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json", 1));
+			httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("de-DE", 1));
+			httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.HttpContext.Session.Get<string>("Token"));
+
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			// Please note:
+			// 1.a new PDF document is needed for this operation. However, for this example, we are going to use an empty PDF.
+			// 2.reason to change proposal is hard-coded.
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			
+			var clientPortfolio = await httpClient.GetFromJsonAsync<PortfolioOutputModel>($"api/v1/user-portfolios/portfolio-id/{planChangeProposalSelectionViewModel.PortfolioId}?portfolio-view-as=Snapshot");
+
+			var reasonToChangeProposalUrl = $"api/v1/reason-to-change-proposed-proposal/investment-category-id/{clientPortfolio.InvestmentCategoryId}/active";
+			var reasons = await httpClient.GetFromJsonAsync<List<ReasonToChangeProposalOutputModel>>(reasonToChangeProposalUrl);
+
+			var orderPortfolioModificationInputModel = new
+			{
+				PortfolioId = planChangeProposalSelectionViewModel.PortfolioId,
+				ProposalId = planChangeProposalSelectionViewModel.Proposals,
+				ReasonToChangeProposalResponsesIds = new List<long> { reasons.First().Id }
+			};
+
+			var byteArray = FileContentHelper.GetFileContent(this.GetType(), "Contract-3A.pdf");
+
+			var httpContent = HttpHelper.CreateMultipartFormDataHttpContent(orderPortfolioModificationInputModel, Convert.FromBase64String(byteArray));
+			var httpResponseMessage = httpClient.PostAsync("api/v1/user-portfolio-orders/modification", httpContent).Result;
+			if (httpResponseMessage.IsSuccessStatusCode == false)
+			{
+				if (httpResponseMessage.StatusCode == System.Net.HttpStatusCode.BadRequest)
+				{
+					var errors = new Dictionary<string, string>();
+					var content = httpResponseMessage.Content.ReadAsStringAsync().Result;
+					var apiErrorModel = JsonConvert.DeserializeObject<ValidationErrorModel>(content);
+
+					foreach (var validationError in apiErrorModel.ValidationErrors)
+					{
+						foreach (var validationErrorDescription in validationError.Value)
+						{
+							errors.Add(validationError.Key, validationErrorDescription.ValidationErrorMessage);
+						}
+					}
+
+					this.ViewData.Add("ApiError", errors);
+				}
+
+				return this.View("/Views/Order/PlanModify.cshtml");
+
+			}
 		}
 
 		#region Private Methods
