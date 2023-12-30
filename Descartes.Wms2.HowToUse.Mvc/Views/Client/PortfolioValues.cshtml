@@ -1,0 +1,53 @@
+﻿@using Descartes.Wms2.HowToUse.Mvc.Shared.DTOs;
+
+@inject IConfiguration Configuration
+
+@{
+	this.ViewData["Title"] = "Portfolio Market Values";
+}
+
+@model PortfolioValuesOutputModel
+
+<div class="text-center">
+	<header class="bg-white border-bottom box-shadow mb-3">
+		<h1 class="display-4">Portfolio Market Values</h1>
+	</header>
+
+	<div class="row align-content-center">
+		<div class="col-md-12">
+			<a href="/ClientPosition/PortfoliosList">Back to list</a>
+		</div>
+	</div>
+
+	<div class="row align-content-center">
+		<div class="col-md-12 align-content-center">
+			<div id="valuesChartContainer" style="display: block; box-sizing: border-box; height: auto; width: auto; margin-left:auto; margin-right:auto;"></div>
+		</div>
+	</div>
+</div>
+
+@section Scripts
+	{
+	<script type="text/javascript">
+		$(function () {
+			var performanceChart = new CanvasJS.Chart("valuesChartContainer", {
+				theme: "light2",
+				zoomEnabled: true,
+				animationEnabled: true,
+				data: [
+					{
+						type: "line",
+						dataPoints: [
+						@foreach (var performance in this.Model.Values.Where(x => x.Date >= (DateTime.Now.AddMonths(-6))).OrderBy(x => x.Date))
+						{
+							<text>{ x: new Date(@performance.Date.Year, @performance.Date.Month, @performance.Date.Day), y: @performance.PortfolioMarketValue }, </text>
+						}
+						]
+					}
+				]
+			});
+
+			performanceChart.render();
+		});
+	</script>
+	}

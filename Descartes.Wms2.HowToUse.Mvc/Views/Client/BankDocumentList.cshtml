@@ -1,0 +1,32 @@
+﻿@using System.Net.Http.Headers;
+@using Descartes.Wms2.HowToUse.Mvc.Extensions;
+@using Descartes.Wms2.HowToUse.Mvc.Shared.DTOs;
+
+@inject IConfiguration Configuration
+
+@{
+	this.ViewData["Title"] = "Document List";
+}
+
+@model BankDocumentListViewModel
+
+<div class="text-center">
+	<header class="bg-white border-bottom box-shadow mb-3">
+		<h1 class="display-4">Bank Documents List</h1>
+	</header>
+
+	<div class="row align-content-center">
+		<div class="col-md-12">
+			<a href="/ClientPosition/PortfoliosList">Back to list</a>
+		</div>
+	</div>
+
+	<div class="row align-content-center">
+		@foreach (var doc in this.Model.BankDocuments.OrderByDescending(x => x.Created))
+		{
+			<div class="col-md-12">
+				@doc.Created.ToString("dd/MM/yyyy") <a href="/ClientPosition/DownloadDocument?portfolioId=@(this.Model.PortfolioId)&reference=@doc.Reference" target="_blank">@doc.Name</a> [@doc.DocumentType]
+			</div>
+		}
+	</div>
+</div>

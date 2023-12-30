@@ -1,0 +1,35 @@
+﻿@{
+	ViewData["Title"] = "PDF Contract";
+}
+
+@model ShowPdfViewModel
+
+<div class="text-center">
+	<header class="bg-white border-bottom box-shadow mb-3">
+		<h1 class="display-4">Get Investment Proposal</h1>
+	</header>
+
+	<form class="row g-3" method="POST" action="/Order/Submit">
+		<input type="hidden" name="Document" value="@Convert.ToBase64String(Model.PdfContent)" />
+
+		<div class="align-content-center">
+			<div class="col-md-12" style="height: 800px">
+				<iframe style="width: 100%; height: 100%;" src="data:application/pdf;base64,@Convert.ToBase64String(this.Model.PdfContent)"></iframe>
+			</div>
+			<br />
+			<br />
+			<div class="col-md-12">
+				<div class="form-group">
+					<label for="portfolioName" class="form-label">Portfolio Name</label>
+					<input type="text" name="PortfolioName" id="portfolioName" class="form-control" maxlength="30" />
+				</div>
+			</div>
+			<br />
+			<div class="col-md-12">
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary">Order</button>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>

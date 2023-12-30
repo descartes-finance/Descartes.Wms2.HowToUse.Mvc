@@ -1,0 +1,115 @@
+﻿@using System.Net.Http.Headers;
+@using Descartes.Wms2.HowToUse.Mvc.Extensions;
+@using Descartes.Wms2.HowToUse.Mvc.Shared.DTOs;
+
+@inject IConfiguration Configuration
+
+@model ProposalOutputModel
+
+@{
+	ViewData["Title"] = "Get Investment Proposal";
+}
+
+@{
+	async Task<SecurityOutputModel> GetSecurity(long securityId)
+	{
+		using var httpClient = new HttpClient { BaseAddress = new Uri(this.Configuration["WmsBaseUrl"]) };
+		httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json", 1));
+		httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("de-DE", 1));
+		httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.Context.Session.Get<string>("Token"));
+
+		return await httpClient.GetFromJsonAsync<SecurityOutputModel>($"api/v1/stocks/id/{securityId}");
+	}
+}
+
+<div class="text-center">
+	<header class="bg-white border-bottom box-shadow mb-3">
+		<h1 class="display-4">Get Investment Proposal</h1>
+	</header>
+
+	<div class="row align-content-center">
+		<div class="col-md-12 align-content-center">
+			<div class="form-group">
+				<a href="/Order/PreparePdf" class="btn btn-primary" role="button">Order</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="row align-content-center">
+		<div class="col-md-12 align-content-center">
+			<div class="table-responsive">
+				<table class="table">
+					<thead>
+						<tr>
+							<th scope="col" style="text-align:left">Security</th>
+							<th scope="col" style="text-align:right">Allocation</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var position in this.Model.Positions)
+						{
+							var security = await GetSecurity(position.SecurityId);
+
+							<tr>
+								<td style="text-align:left">@security.Isin - @security.Name</td>
+								<td style="text-align:right">@position.Allocation%</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<div class="row align-content-center">
+		<div class="col-md-12 align-content-center">
+			<div id="chartContainer" style="display: block; box-sizing: border-box; height: auto; width: auto; margin-left:auto; margin-right:auto;"></div>
+		</div>
+	</div>
+</div>
+
+@section Scripts
+	{
+	<script type="text/javascript">
+		$(function () {
+			var chart = new CanvasJS.Chart("chartContainer", {
+				animationEnabled: true,
+				title: {
+					text: "Composition"
+				},
+				legend: {
+					horizontalAlign: "center",
+					fontSize: 10,
+					fontFamily: "Helvetica"
+				},
+				theme: "light2",
+				data: [
+					{
+						type: "pie",
+						indexLabelFontFamily: "Garamond",
+						indexLabelFontSize: 20,
+						indexLabel: "{label} {y}%",
+						startAngle: -20,
+						showInLegend: true,
+						toolTipContent: "{legendText} {y}%",
+						dataPoints: [
+		@foreach (var position in this.Model.Positions)
+		{
+			<text>{ y: @position.Allocation, legendText: '@((await GetSecurity(position.SecurityId)).Isin)', label: '@((await GetSecurity(position.SecurityId)).Isin)' }, </text>
+		}
+										]
+					}
+				],
+				options: {
+					plugins: {
+						legend: {
+							position: 'top'
+						}
+					}
+				}
+			});
+
+			chart.render();
+		});
+	</script>
+}

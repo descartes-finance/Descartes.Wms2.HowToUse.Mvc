@@ -1,0 +1,61 @@
+﻿@using Descartes.Wms2.HowToUse.Mvc.Shared.DTOs;
+@using System.Net.Http.Headers;
+@inject IConfiguration Configuration
+
+@{
+	using var httpClient = new HttpClient { BaseAddress = new Uri(Configuration["WmsBaseUrl"]) };
+	httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json", 1));
+	httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("de-DE", 1));
+	httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Configuration["GuestToken"]);
+
+	var gendersList = httpClient.GetFromJsonAsync<IList<GenderOutputModel>>("/api/v1/genders").Result;
+}
+
+@model FirstFactorRegistrationViewModel
+
+<form action="client/FirstFactorRegistration" method="POST">
+	<div class="text-center">
+		<header class="bg-white border-bottom box-shadow mb-3">
+			<h1 class="display-4">First Factor Registration</h1>
+		</header>
+
+		<div class="row">
+			<div class="col-md-2">
+				Gender
+			</div>
+			<div class="col-md-10">
+				<select name="GenderId">
+					<option value="@gendersList.ElementAt(0).Id">@gendersList.ElementAt(0).Name</option>
+					<option value="@gendersList.ElementAt(1).Id">@gendersList.ElementAt(1).Name</option>
+				</select>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-2">
+				Name
+			</div>
+			<div class="col-md-10">
+				<input type="text" name="ClientName" value="@this.Model.ClientName" />
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-2">
+				Surname
+			</div>
+			<div class="col-md-10">
+				<input type="text" name="ClientSurname" value="@this.Model.ClientSurname" />
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-2">
+				Email
+			</div>
+			<div class="col-md-10">
+				<input type="text" name="ClientEmail" value="@this.Model.ClientEmail" />
+			</div>
+		</div>
+	</div>
+</form>

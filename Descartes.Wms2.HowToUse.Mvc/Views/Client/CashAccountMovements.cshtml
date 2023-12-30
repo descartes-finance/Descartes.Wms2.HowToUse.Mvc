@@ -1,0 +1,59 @@
+﻿@using System.Net.Http.Headers;
+@using Descartes.Wms2.HowToUse.Mvc.Extensions;
+@using Descartes.Wms2.HowToUse.Mvc.Shared.DTOs;
+
+@inject IConfiguration Configuration
+
+@model IList<CashAccountMovementViewModel>
+
+@{
+	ViewData["Title"] = "Cash Amount Movements";
+}
+
+<div class="text-center">
+	<header class="bg-white border-bottom box-shadow mb-3">
+		<h1 class="display-4">Cash Amount Movements</h1>
+	</header>
+
+	<div class="row align-content-center">
+		<div class="col-md-12">
+			<a href="/ClientPosition/PortfoliosList">Back to list</a>
+		</div>
+	</div>
+
+	<div class="row align-content-center">
+		<div class="col-md-12 align-content-center">
+			<div class="table-responsive">
+				<table class="table">
+					<thead>
+						<tr>
+							<th scope="col">TransactionId</th>
+							<th scope="col">Booking Code</th>
+							<th scope="col">Booking Description</th>
+							<th scope="col">Movement Date</th>
+							<th scope="col">Movement Description</th>
+							<th scope="col">Amount</th>
+							<th scope="col">Saldo</th>
+							<th scope="col">User Text</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var movement in this.Model)
+						{
+							<tr>
+								<td>@movement.TransactionId</td>
+								<td>@movement.BookingCode</td>
+								<td>@movement.BookingCodeDescription</td>
+								<td>@movement.BookingDate.ToString("dd/MM/yyyy")</td>
+								<td>@movement.MovementDescription</td>
+								<td>@movement.MovementAmount</td>
+								<td>@movement.Saldo</td>
+								<td>@movement.UsetText</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

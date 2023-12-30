@@ -1,0 +1,60 @@
+﻿@using Descartes.Wms2.HowToUse.Mvc.Shared.DTOs;
+@using Descartes.Wms2.HowToUse.Mvc.Shared.DTOs.Errors;
+@model RiskProfileCreateOrUpdateViewModel
+
+@{
+	ViewData["Title"] = "Get Investment Proposal";
+
+	var userResponsesIds = this.Model.CustomerQuestionnaireResponses?.Select(x => x.QuestionnaireResponseId).ToList();
+
+	var bulletOptions = new Dictionary<int, string> { { 0, "a" }, { 1, "b" }, { 2, "c" }, { 3, "d" }, { 4, "e" }, { 5, "f" } };
+}
+
+<div class="text-center">
+	<header class="bg-white border-bottom box-shadow mb-3">
+		<h1 class="display-4">Get Investment Proposal</h1>
+	</header>
+
+	<form class="row g-3" method="POST" action="/GetProposal/RiskProfileCalculation">
+		@if (this.Model.Questionnaire != null)
+		{
+			<input type="hidden" name="QuestionnaireId" value="@this.Model.QuestionnaireId" />
+			<input type="hidden" name="BusinessLineId" value="@this.Model.BusinessLineId" />
+			<input type="hidden" name="InvestmentCategoryId" value="@this.Model.InvestmentCategoryId" />
+		}
+
+		@foreach (var question in this.Model.Questionnaire.Sections.SelectMany(s => s.Questions))
+		{
+			<div class="col-md-12">
+				<div class="form-group">
+					<input type="hidden" name="Responses.Index" value="@question.Id" />
+
+					<strong>@question.Description</strong>
+
+					@for (var index = 0; index < question.Responses.Count; index++)
+					{
+						@if (userResponsesIds != null && userResponsesIds.Contains(question.Responses[index].Id))
+						{
+							<div class="radio" style="padding-left: 22px;">
+								<input id="@(question.Responses[index].Id)" type="radio" name="Responses[@question.Id]" value="@question.Responses[index].Id" checked /> @bulletOptions[index]) @question.Responses[index].Description
+							</div>
+						}
+						else
+						{
+							<div class="radio" style="padding-left: 22px;">
+								<input id="@(question.Responses[index].Id)" type="radio" name="Responses[@question.Id]" value="@question.Responses[index].Id" /> @bulletOptions[index]) @question.Responses[index].Description
+							</div>
+						}
+					}
+				</div>
+			</div>
+		}
+
+		<div class="col-lg-12">
+			<div class="form-group">
+				<button type="submit" class="btn btn-primary">Next</button>
+			</div>
+		</div>
+	</form>
+
+</div>

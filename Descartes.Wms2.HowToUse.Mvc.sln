@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33801.468
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Descartes.Wms2.HowToUse.Mvc", "Descartes.Wms2.HowToUse.Mvc\Descartes.Wms2.HowToUse.Mvc.csproj", "{F111B8BF-22D1-4C68-A002-A8FBECB127EA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Descartes.Wms2.HowToUse.Mvc.Shared.DTOs", "Descartes.Wms2.HowToUse.Mvc.Shared.DTOs\Descartes.Wms2.HowToUse.Mvc.Shared.DTOs.csproj", "{9B6CD49B-34DE-4A83-8A63-AB3F1026DA4F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01 Client Creation", "01 Client Creation", "{4CF7C157-94C4-49C8-82B2-48339D444C21}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00 Common", "00 Common", "{3D978AD5-D827-4396-A278-735A69940EB0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Descartes.Wms2.HowToUse.Mvc.Helpers", "Descartes.Wms2.HowToUse.Mvc.Helpers\Descartes.Wms2.HowToUse.Mvc.Helpers.csproj", "{13060ED2-9E51-41BC-9FF5-D3A9FA7383D9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F111B8BF-22D1-4C68-A002-A8FBECB127EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F111B8BF-22D1-4C68-A002-A8FBECB127EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F111B8BF-22D1-4C68-A002-A8FBECB127EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F111B8BF-22D1-4C68-A002-A8FBECB127EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B6CD49B-34DE-4A83-8A63-AB3F1026DA4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B6CD49B-34DE-4A83-8A63-AB3F1026DA4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B6CD49B-34DE-4A83-8A63-AB3F1026DA4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B6CD49B-34DE-4A83-8A63-AB3F1026DA4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13060ED2-9E51-41BC-9FF5-D3A9FA7383D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13060ED2-9E51-41BC-9FF5-D3A9FA7383D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13060ED2-9E51-41BC-9FF5-D3A9FA7383D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13060ED2-9E51-41BC-9FF5-D3A9FA7383D9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F111B8BF-22D1-4C68-A002-A8FBECB127EA} = {4CF7C157-94C4-49C8-82B2-48339D444C21}
+		{9B6CD49B-34DE-4A83-8A63-AB3F1026DA4F} = {3D978AD5-D827-4396-A278-735A69940EB0}
+		{13060ED2-9E51-41BC-9FF5-D3A9FA7383D9} = {3D978AD5-D827-4396-A278-735A69940EB0}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D58A909F-C39E-497A-8154-3258150C865F}
+	EndGlobalSection
+EndGlobal

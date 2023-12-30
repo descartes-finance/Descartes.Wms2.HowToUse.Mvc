@@ -1,0 +1,171 @@
+﻿@using System.Net.Http.Headers;
+@using Descartes.Wms2.HowToUse.Mvc.Extensions;
+@using Descartes.Wms2.HowToUse.Mvc.Shared.DTOs;
+
+@inject IConfiguration Configuration
+
+@{
+	this.ViewData["Title"] = "Portfolio Details";
+}
+
+@{
+	async Task<SecurityOutputModel> GetSecurity(long securityId)
+	{
+		using var httpClient = new HttpClient { BaseAddress = new Uri(this.Configuration["WmsBaseUrl"]) };
+		httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json", 1));
+		httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("de-DE", 1));
+		httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.Context.Session.Get<string>("Token"));
+
+		return await httpClient.GetFromJsonAsync<SecurityOutputModel>($"api/v1/stocks/id/{securityId}");
+	}
+
+	async Task<string> GetProposalName(long proposalId)
+	{
+		using var httpClient = new HttpClient { BaseAddress = new Uri(this.Configuration["WmsBaseUrl"]) };
+		httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json", 1));
+		httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("de-DE", 1));
+		httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.Context.Session.Get<string>("Token"));
+
+		var proposal = await httpClient.GetFromJsonAsync<ProposalOutputModel>("api/v1/proposals/id/" + proposalId);
+
+		return proposal.Code;
+	}
+
+	async Task<string> GetInvestmentCategoryCode(long id)
+	{
+		using var httpClient = new HttpClient { BaseAddress = new Uri(this.Configuration["WmsBaseUrl"]) };
+		httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json", 1));
+		httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("de-DE", 1));
+		httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.Context.Session.Get<string>("Token"));
+
+		var result = await httpClient.GetFromJsonAsync<InvestmentCategoryOutputModel>("api/v1/investment-categories/id/" + id);
+
+		return result.Code;
+	}
+}
+
+@model PortfolioDetailViewModel
+
+<div class="text-center">
+	<header class="bg-white border-bottom box-shadow mb-3">
+		<h1 class="display-4">Client Portfolio @this.Model.Portfolio.Name</h1>
+	</header>
+
+	<div class="row align-content-center">
+		<div class="col-md-12 align-content-center">
+			<div class="table-responsive">
+				<table class="table">
+					<thead>
+						<tr>
+							<th scope="col">Category</th>
+							<th scope="col">Proposal Type</th>
+							<th scope="col">Profit/Lost (CHF)</th>
+							<th scope="col">Market Value</th>
+							<th scope="col">Pending Order</th>
+							<th scope="col">In Trading</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>@await GetInvestmentCategoryCode(this.Model.Portfolio.InvestmentCategoryId)</td>
+							<td>@await GetProposalName(this.Model.Portfolio.ProposalId)</td>
+							<td>@this.Model.Portfolio.ProfitOrLost</td>
+							<td>@this.Model.Portfolio.MarketValue</td>
+							<td>@(this.Model.Portfolio.HasPendingOrder == true ? "YES" : "NO")</td>
+							<td>@(this.Model.Portfolio.IsTrading == true ? "YES" : "NO")</td>
+						</tr>
+					<tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<div class="row align-content-center">
+		<div class="col-md-12">
+			<a href="/ClientPosition/PortfoliosList?portfolioId=@(this.Model.Portfolio.Id)">Modify</a>&nbsp;&nbsp;&nbsp;
+			<a href="/ClientPosition/PortfoliosList">Back to list</a>
+		</div>
+	</div>
+
+	<div class="row align-content-center">
+		<div class="col-md-12 align-content-center">
+			<div class="table-responsive">
+				<table class="table">
+					<thead>
+						<tr>
+							<th scope="col" style="text-align:left">Security</th>
+							<th scope="col" style="text-align:right">Allocation</th>
+							<th scope="col" style="text-align:right">Price (CHF)</th>
+							<th scope="col" style="text-align:right">Performance</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var position in this.Model.Portfolio.Positions)
+						{
+							var security = await GetSecurity(position.SecurityId);
+
+							<tr>
+								<td style="text-align:left">@security.Isin - @security.Name</td>
+								<td style="text-align:right">@position.Allocation%</td>
+								<td style="text-align:right">@position.Price</td>
+								<td style="text-align:right">@position.Performance</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<div class="row align-content-center">
+		<div class="col-md-12 align-content-center">
+			<div id="proposalCompositionChart" style="display: block; box-sizing: border-box; height: auto; width: auto; margin-left:auto; margin-right:auto;"></div>
+		</div>
+	</div>
+</div>
+
+@section Scripts
+	{
+	<script type="text/javascript">
+		$(function () {			
+			var proposalCompositionChart = new CanvasJS.Chart("proposalCompositionChart", {
+				animationEnabled: true,
+				title: {
+					text: "Composition"
+				},
+				legend: {
+					horizontalAlign: "center",
+					fontSize: 10,
+					fontFamily: "Helvetica"
+				},
+				theme: "light2",
+				data: [
+					{
+						type: "pie",
+						indexLabelFontFamily: "Garamond",
+						indexLabelFontSize: 20,
+						indexLabel: "{label} {y}%",
+						startAngle: -20,
+						showInLegend: true,
+						toolTipContent: "{legendText} {y}%",
+						dataPoints: [
+		@foreach (var position in this.Model.Portfolio.Positions)
+		{
+			<text>{ y: @position.Allocation, legendText: '@((await GetSecurity(position.SecurityId)).Isin)', label: '@((await GetSecurity(position.SecurityId)).Isin)' }, </text>
+		}
+								]
+					}
+				],
+				options: {
+					plugins: {
+						legend: {
+							position: 'top'
+						}
+					}
+				}
+			});
+
+			proposalCompositionChart.render();
+		});
+	</script>
+	}

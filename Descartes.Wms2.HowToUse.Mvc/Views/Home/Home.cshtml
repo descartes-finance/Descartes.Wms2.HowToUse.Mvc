@@ -1,0 +1,49 @@
+﻿@{
+	ViewData["Title"] = "Home";
+}
+
+<div class="text-center">
+	<header class="bg-white border-bottom box-shadow mb-3">
+		<h1 class="display-4">WMS2 APIs Service - Walk Through How To Do</h1>
+	</header>
+
+	<div class="row g-3">
+		<div class="card">
+			<div class="card-body">
+				<form method="POST" action="/Home/CreateAsAdmin">
+					<label for="token" class="form-label">Administrative Client Registration</label>
+					<br />
+					<button type="submit" class="btn btn-primary">Create</button>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<br />
+
+	<div class="row g-3">
+		<div class="card">
+			<div class="card-body">
+				<form method="POST" action="/Home/CreateAsClient">
+					<label for="token" class="form-label">Client Self Registration</label>
+					<br />
+					<button type="submit" class="btn btn-primary">Create</button>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<br />
+
+	<div class="row g-3">
+		<div class="card">
+			<div class="card-body">
+				<form method="POST" action="/Home/ClientCockpit">
+					<label for="token" class="form-label">Client Cockpit</label>
+					<br />
+					<button type="submit" class="btn btn-primary">View</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

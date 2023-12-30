@@ -1,0 +1,53 @@
+﻿@{
+	ViewData["Title"] = "Order submission";
+}
+
+<div class="text-center">
+	@if (this.ViewData.Keys.Contains("OrderId"))
+	{
+		<header class="bg-white border-bottom box-shadow mb-3">
+			<h1 class="display-4">Order Sumbission Completed</h1>
+		</header>
+
+		<div class="align-content-center">
+			<div class="col-md-12">
+				<label>Portfolio <b>@this.ViewData["PortfolioName"]</b> has been create!</label>
+			</div>
+			<div class="col-md-12">
+				<label>Order ID: <b>@this.ViewData["OrderId"]</b></label>
+			</div>
+			<div class="col-md-12">
+				<label>Order ID: <b>@this.ViewData["IBAN"]</b></label>
+			</div>
+		</div>
+	}
+	else
+	{
+		<header class="bg-white border-bottom box-shadow mb-3">
+			<h1 class="display-4">Order Sumbission With Error(s)</h1>
+		</header>
+
+		<div class="align-content-center">
+			<div class="col-12">
+				<div style="color: red">
+					<ul>
+						@if (this.ViewData.Keys.Contains("ApiError"))
+						{
+							var apiErrors = this.ViewData["ApiError"] as Dictionary<string, string>;
+							foreach (var validationError in apiErrors)
+							{
+								<li>@validationError.Key: @validationError.Value</li>
+							}
+						}
+					</ul>
+				</div>
+			</div>
+		</div>
+	}
+
+	<div class="align-content-center">
+		<div class="col-12">
+			<a href="/Home/Index">Home</a>
+		</div>
+	</div>
+</div>

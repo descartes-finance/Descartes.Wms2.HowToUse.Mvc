@@ -1,0 +1,202 @@
+﻿@using Descartes.Wms2.HowToUse.Mvc.Shared.DTOs;
+@using System.Net.Http.Headers;
+@using Descartes.Wms2.HowToUse.Mvc.Shared.DTOs.Errors;
+@using Descartes.Wms2.HowToUse.Mvc.Models;
+@inject IConfiguration Configuration
+
+@{
+	ViewData["Title"] = "Administrative client registration";
+
+	var guestToken = this.Configuration["GuestToken"];
+	var baseUrl = this.Configuration["WmsBaseUrl"];
+
+	using var httpClient = new HttpClient { BaseAddress = new Uri(baseUrl) };
+	httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json", 1));
+	httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("de-DE", 1));
+	httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", guestToken);
+
+	var languages = httpClient.GetFromJsonAsync<IList<LanguageOutputModel>>("/api/v1/languages").Result;
+	var nationalities = httpClient.GetFromJsonAsync<IList<NationalityOutputModel>>("api/v1/nationalities").Result;
+	var countries = httpClient.GetFromJsonAsync<IList<CountryOutputModel>>("api/v1/countries").Result;
+	var pensionSituations = httpClient.GetFromJsonAsync<IList<PensionSituationOutputModel>>("api/v1/pension-situations").Result;
+	var taxLiabilities = httpClient.GetFromJsonAsync<IList<TaxLiabilityOutputModel>>("api/v1/tax-liabilities").Result;
+	var civilStatuses = httpClient.GetFromJsonAsync<IList<CivilStatusOutputModel>>("api/v1/civil-statuses").Result;
+	var genders = httpClient.GetFromJsonAsync<IList<GenderOutputModel>>("/api/v1/genders").Result;
+	var phonePrefixes = new List<string> { "0041", "0039" };
+
+	var languagesSelectList = new SelectList(languages.Select(x => new KeyValuePair<string, string>(x.Id.ToString(), x.Name)), "Key", "Value");
+	var nationalitiesSelectList = new SelectList(nationalities.Select(x => new KeyValuePair<string, string>(x.Id.ToString(), x.Name)), "Key", "Value");
+	var countriesSelectList = new SelectList(countries.Select(x => new KeyValuePair<string, string>(x.Id.ToString(), x.Name)), "Key", "Value");
+	var pensionSituationsSelectList = new SelectList(pensionSituations.Select(x => new KeyValuePair<string, string>(x.Id.ToString(), x.Description)), "Key", "Value");
+	var taxLiabilitiesSelectList = new SelectList(taxLiabilities.Select(x => new KeyValuePair<string, string>(x.Id.ToString(), x.Description)), "Key", "Value");
+	var civilStatusesSelectList = new SelectList(civilStatuses.Select(x => new KeyValuePair<string, string>(x.Id.ToString(), x.Name)), "Key", "Value");
+	var gendersSelectList = new SelectList(genders.Select(x => new KeyValuePair<string, string>(x.Id.ToString(), x.Name)), "Key", "Value");
+	var phonePrefixesSelectList = new SelectList(phonePrefixes.Select(x => new KeyValuePair<string, string>(x.ToString(), x)), "Key", "Value");
+}
+
+@model ClientViewModel
+
+@if (this.Model.ClientId.HasValue)
+{
+	<div class="text-center">
+		<header class="bg-white border-bottom box-shadow mb-3">
+			<h1 class="display-4">Administrative client registration</h1>
+		</header>
+		<div class="col-md-12">
+			Client <b>@this.Model.Name @this.Model.Surname</b> (ID @this.Model.ClientId) has been created.
+		</div>
+		<br />
+		<div class="col-md-12">
+			Next step is to create a client risk profile and get back an investment proposal.<br />
+			<a href="/GetProposal/RiskProfileCalculation">Proceed to get an investment proposal</a>.
+		</div>
+	</div>
+}
+else
+{
+	<div class="text-center">
+		<header class="bg-white border-bottom box-shadow mb-3">
+			<h1 class="display-4">Administrative client registration</h1>
+		</header>
+
+		<form class="row g-3" method="POST" action="/Admin/CreateClient">
+			@Html.HiddenFor(x => x.ClientId)
+			@Html.HiddenFor(x => x.LegalAcceptanceId)
+
+			<div class="col-md-12">
+				<label for="token" class="form-label">Admin Token</label>
+				@Html.TextBoxFor(m => m.Token, new { id = "token", @class = "form-control" })
+				@Html.ValidationMessageFor(m => m.Token, "", new { @class = "text-danger" })
+			</div>
+
+			<br />
+
+			<div class="col-md-2">
+				<label for="gender" class="form-label">Gender</label>
+				@Html.DropDownListFor(m => m.GenderId, gendersSelectList, new { @class = "form-select", id = "gender" })
+				@Html.ValidationMessageFor(m => m.GenderId, "", new { @class = "text-danger" })
+			</div>
+			<div class="col-md-4">
+				<label for="name" class="form-label">Name</label>
+				@Html.TextBoxFor(m => m.Name, new { id = "name", @class = "form-control" })
+				@Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+			</div>
+			<div class="col-md-4">
+				<label for="surname" class="form-label">Surname</label>
+				@Html.TextBoxFor(m => m.Surname, new { id = "surname", @class = "form-control" })
+				@Html.ValidationMessageFor(m => m.Surname, "", new { @class = "text-danger" })
+			</div>
+			<div class="col-2">
+				<label for="birthDate" class="form-label">BirthDate</label>
+				<input type='text' class="form-control" id='birthDate' name="BirthDate" />
+				@Html.ValidationMessageFor(m => m.BirthDate, "", new { @class = "text-danger" })
+			</div>
+
+			<div class="col-md-6">
+				<label for="email" class="form-label">Email (Email address is unique in the system)</label>
+				@Html.TextBoxFor(m => m.Email, new { id = "email", @class = "form-control" })
+				@Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+			</div>
+			<div class="col-md-1">
+				<label for="phonePrefix" class="form-label">Prefix</label>
+				@Html.DropDownListFor(m => m.PhonePrefix, phonePrefixesSelectList, new { @class = "form-select", id = "phonePrefix"})
+				@Html.ValidationMessageFor(m => m.PhonePrefix, "", new { @class = "text-danger" })
+			</div>
+			<div class="col-md-3">
+				<label for="phoneNumber" class="form-label">Mobile Number</label>
+				<input type="number" class="form-control" id="phoneNumber" name="PhoneNumber" min="0" value="@this.Model.PhoneNumber" maxlength="10">
+				@Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })
+			</div>
+			<div class="col-md-2">
+				<label for="language" class="form-label">Language</label>
+				@Html.DropDownListFor(m => m.LanguageId, languagesSelectList, new { @class = "form-select", id = "language"})
+				@Html.ValidationMessageFor(m => m.LanguageId, "", new { @class = "text-danger" })
+			</div>
+
+			<div class="col-4">
+				<label for="inputStreet" class="form-label">Street</label>
+				<input type="text" class="form-control" id="inputStreet" name="Street" placeholder="" value="@this.Model.Street">
+				@Html.ValidationMessageFor(m => m.Street, "", new { @class = "text-danger" })
+			</div>
+			<div class="col-1">
+				<label for="inputStreetNr" class="form-label">Street Nr.</label>
+				<input type="number" min="0" step="1" class="form-control" id="inputStreetNr" name="StreetNr" placeholder="" value="@this.Model.StreetNr" maxlength="4">
+				@Html.ValidationMessageFor(m => m.StreetNr, "", new { @class = "text-danger" })
+			</div>
+			<div class="col-md-3">
+				<label for="inputCity" class="form-label">City</label>
+				<input type="text" class="form-control" id="inputCity" name="City" value="@this.Model.City">
+				@Html.ValidationMessageFor(m => m.City, "", new { @class = "text-danger" })
+			</div>
+			<div class="col-md-1">
+				<label for="inputZip" class="form-label">Zip</label>
+				<input class="form-control" id="inputZip" name="Zip" type="number" min="0" value="@this.Model.Zip" maxlength="5">
+				@Html.ValidationMessageFor(m => m.Zip, "", new { @class = "text-danger" })
+			</div>
+			<div class="col-md-3">
+				<label for="country" class="form-label">State</label>
+				@Html.DropDownListFor(m => m.CountryId, countriesSelectList, new { @class = "form-select", id = "country"})
+				@Html.ValidationMessageFor(m => m.CountryId, "", new { @class = "text-danger" })
+			</div>
+
+			<div class="col-6">
+				<label for="pensionSituation" class="form-label">Pension</label>
+				@Html.DropDownListFor(m => m.PensionSituationId, pensionSituationsSelectList, new { @class = "form-select", id = "pensionSituation"})
+				@Html.ValidationMessageFor(m => m.PensionSituationId, "", new { @class = "text-danger" })
+			</div>
+			<div class="col-2">
+				<label for="nationality" class="form-label">Nationality</label>
+				@Html.DropDownListFor(m => m.NationalityId, nationalitiesSelectList, new { @class = "form-select", id = "nationality"})
+				@Html.ValidationMessageFor(m => m.NationalityId, "", new { @class = "text-danger" })
+			</div>
+			<div class="col-2">
+				<label for="civilStatus" class="form-label">Civil Status</label>
+				@Html.DropDownListFor(m => m.CivilStatusId, civilStatusesSelectList, new { @class = "form-select", id = "civilStatus"})
+				@Html.ValidationMessageFor(m => m.CivilStatusId, "", new { @class = "text-danger" })
+			</div>
+			<div class="col-2">
+				<label for="civilStatusDate" class="form-label">Status Date</label>
+				<input type='text' class="form-control" id='civilStatusDate' name="CivilStatusDate" />
+				@Html.ValidationMessageFor(m => m.CivilStatusDate, "", new { @class = "text-danger" })
+			</div>
+
+			<div class="col-12">
+				<div style="color: red">
+					<ul>
+						@if (this.ViewData.Keys.Contains("ApiError"))
+						{
+							var apiErrors = this.ViewData["ApiError"] as Dictionary<string, string>;
+							foreach (var validationError in apiErrors)
+							{
+								<li>@validationError.Key: @validationError.Value</li>
+							}
+						}
+					</ul>
+				</div>
+			</div>
+
+			<div class="col-12">
+				<button type="submit" class="btn btn-primary">Register</button>
+			</div>
+		</form>
+	</div>
+}
+
+@section Scripts
+	{
+	<script src="~/js/bootstrap-datepicker.js"></script>
+	<script type="text/javascript">
+		$(function () {
+			$('#civilStatusDate').datepicker({
+				uiLibrary: 'bootstrap',
+				format: 'dd/mm/yyyy'
+			});
+
+			$('#birthDate').datepicker({
+				uiLibrary: 'bootstrap',
+				format: 'dd/mm/yyyy'
+			});
+		}
+			});
+	</script>
+}

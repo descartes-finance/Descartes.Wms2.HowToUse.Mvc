@@ -1,0 +1,79 @@
+﻿@using System.Net.Http.Headers;
+@using Descartes.Wms2.HowToUse.Mvc.Extensions;
+@using Descartes.Wms2.HowToUse.Mvc.Shared.DTOs;
+
+@inject IConfiguration Configuration
+
+@{
+	this.ViewData["Title"] = "Client Cockpit";
+}
+
+@{
+	async Task<string> GetInvestmentCategoryCode(long id)
+	{
+		using var httpClient = new HttpClient { BaseAddress = new Uri(this.Configuration["WmsBaseUrl"]) };
+		httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json", 1));
+		httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("de-DE", 1));
+		httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.Context.Session.Get<string>("Token"));
+
+		var result = await httpClient.GetFromJsonAsync<InvestmentCategoryOutputModel>("api/v1/investment-categories/id/" + id);
+
+		return result.Code;
+	}
+}
+
+@model PortfoliosListViewModel
+
+<div class="text-center">
+	<header class="bg-white border-bottom box-shadow mb-3">
+		<h1 class="display-4">Client Portfolios List</h1>
+	</header>
+
+	<div class="row align-content-center">
+		<div class="col-md-12">
+			Client @this.Model.ClientName @this.Model.ClientSurname <a href="">Edit</a>
+		</div>
+	</div>
+
+	<div class="row align-content-center">
+		<br />
+	</div>
+
+	<div class="row align-content-center">
+		<div class="col-md-12 align-content-center">
+			<div class="table-responsive">
+				<table class="table">
+					<thead>
+						<tr>
+							<th scope="col">Category Type</th>
+							<th scope="col">System Name</th>
+							<th scope="col">Name</th>
+							<th></th>
+							<th></th>
+							<th></th>
+							<th></th>
+							<th></th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var portfolio in this.Model.Portfolios)
+						{
+							<tr>
+								<td>@await GetInvestmentCategoryCode(portfolio.InvestmentCategoryId)</td>
+								<td>@portfolio.SystemName</td>
+								<td>@portfolio.Name</td>
+								<td><a href="/ClientPosition/PortfolioDetail?portfolioId=@(portfolio.Id)">Details</a></td>
+								<td><a href="/ClientPosition/PortfolioPerformances?portfolioId=@(portfolio.Id)">Performances</a></td>
+								<td><a href="/ClientPosition/PortfolioMarketValues?portfolioId=@(portfolio.Id)">Market values</a></td>
+								<td><a href="/ClientPosition/PortfolioCashAmount?portfolioId=@(portfolio.Id)">Cash Amount</a></td>
+								<td><a href="/ClientPosition/PortfolioCashAmountMovements?portfolioId=@(portfolio.Id)">Cash Movements</a></td>
+								<td><a href="/ClientPosition/BankDocumentList?portfolioId=@(portfolio.Id)">Documents</a></td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

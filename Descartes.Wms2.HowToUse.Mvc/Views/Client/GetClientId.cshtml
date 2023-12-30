@@ -1,0 +1,30 @@
+﻿@{
+}
+
+@model GetClientIdViewModel
+
+<div class="text-center">
+	<header class="bg-white border-bottom box-shadow mb-3">
+		<h1 class="display-4">Administrative client registration</h1>
+	</header>
+
+	<form class="row g-3" method="POST" action="/Client/SetClientId">
+		<div class="col-md-12">
+			<label for="token" class="form-label">Admin Token</label>
+			@Html.TextBoxFor(m => m.Token, new { id = "token", @class = "form-control" })
+			@Html.ValidationMessageFor(m => m.Token, "", new { @class = "text-danger" })
+		</div>
+
+		<br />
+
+		<div class="col-md-12">
+			<label for="clientId" class="form-label">Client ID</label>
+			<input type="number" class="form-control" id="clientId" name="ClientId" min="0" value="@this.Model.ClientId" maxlength="5">
+			@Html.ValidationMessageFor(m => m.ClientId, "", new { @class = "text-danger" })
+		</div>
+
+		<div class="col-12">
+			<button type="submit" class="btn btn-primary">Go to client's portfolio list</button>
+		</div>
+	</form>
+</div>
