@@ -4,11 +4,15 @@
 
 @model PlanChangeProposalSelectionViewModel
 
-<form method="POST" action="Order/PlanChange">
+<form method="POST" action="/Order/PlanChange">
 	@Html.HiddenFor(x => x.ClientId)
 	@Html.HiddenFor(x => x.PortfolioId)
 
 	<div class="text-center">
+		<header class="bg-white border-bottom box-shadow mb-3">
+			<h1 class="display-4">Modify Plan @this.Model.PortfolioName</h1>
+		</header>
+
 		<div class="row">
 			<div class="col-12">
 				New portfolio strategy: <select name="ProposalId">
@@ -20,7 +24,7 @@
 			</div>
 			<br /><br />
 			<div class="col-12">
-				<button type="submit" class="btn btn-primary">Prepare PDF</button>
+				<button type="submit" class="btn btn-primary">Submit Order</button>
 			</div>
 		</div>
 	</div>

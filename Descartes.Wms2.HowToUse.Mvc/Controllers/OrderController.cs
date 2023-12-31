@@ -77,7 +77,7 @@ namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 
 			// Order reservation and order submission
 			var reservationPayload = JsonConvert.SerializeObject(new { UserId = this.HttpContext.Session.Get<long>("ClientId"), InvestmentCategoryId = this.HttpContext.Session.Get<long>("InvestmentCategoryId") });
-			var httpResponseMessage = httpClient.PostAsync("api/v1/user-portfolio-orders/reservation", new StringContent(reservationPayload, Encoding.UTF8, "application/json")).Result;
+			var httpResponseMessage = await httpClient.PostAsync("api/v1/user-portfolio-orders/reservation", new StringContent(reservationPayload, Encoding.UTF8, "application/json"));
 			var reservationAsString = httpResponseMessage.Content.ReadAsStringAsync().Result;
 			var reservation = JsonConvert.DeserializeObject<ReservationOutputModel>(reservationAsString);
 
@@ -146,6 +146,7 @@ namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 			{
 				ClientId = this.HttpContext.Session.Get<long>("ClientId"),
 				PortfolioId = portfolioId,
+				PortfolioName = clientPortfolio.Name,
 				Proposals = alternativeProposals
 			};
 
@@ -162,25 +163,28 @@ namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 
 			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			// Please note:
-			// 1.a new PDF document is needed for this operation. However, for this example, we are going to use an empty PDF.
-			// 2.reason to change proposal is hard-coded.
+			// 1.a new PDF document is needed for plan change. For this example we simply use an empty PDF.
+			// 2.reason to change proposal is hard-coded while should be choosen by client
 			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			
 			var clientPortfolio = await httpClient.GetFromJsonAsync<PortfolioOutputModel>($"api/v1/user-portfolios/portfolio-id/{planChangeProposalSelectionViewModel.PortfolioId}?portfolio-view-as=Snapshot");
 
 			var reasonToChangeProposalUrl = $"api/v1/reason-to-change-proposed-proposal/investment-category-id/{clientPortfolio.InvestmentCategoryId}/active";
-			var reasons = await httpClient.GetFromJsonAsync<List<ReasonToChangeProposalOutputModel>>(reasonToChangeProposalUrl);
+			var reasonToChangeProposal = await httpClient.GetFromJsonAsync<ReasonToChangeProposalOutputModel>(reasonToChangeProposalUrl);
 
 			var orderPortfolioModificationInputModel = new
 			{
 				PortfolioId = planChangeProposalSelectionViewModel.PortfolioId,
-				ProposalId = planChangeProposalSelectionViewModel.Proposals,
-				ReasonToChangeProposalResponsesIds = new List<long> { reasons.First().Id }
+				// Assume this is the new portfolio model selected by client
+				ProposalId = planChangeProposalSelectionViewModel.ProposalId,
+				// Assume this is reason to change proposal selected by client
+				ReasonToChangeProposalResponsesIds = new List<long> { reasonToChangeProposal.Responses.First().Id }
 			};
 
+			// For simplicity, use an empty PDF contract template
 			var byteArray = FileContentHelper.GetFileContent(this.GetType(), "Contract-3A.pdf");
 
-			var httpContent = HttpHelper.CreateMultipartFormDataHttpContent(orderPortfolioModificationInputModel, Convert.FromBase64String(byteArray));
+			var httpContent = HttpHelper.CreateMultipartFormDataHttpContent(orderPortfolioModificationInputModel, byteArray);
 			var httpResponseMessage = httpClient.PostAsync("api/v1/user-portfolio-orders/modification", httpContent).Result;
 			if (httpResponseMessage.IsSuccessStatusCode == false)
 			{
@@ -202,7 +206,13 @@ namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 				}
 
 				return this.View("/Views/Order/PlanModify.cshtml");
+			}
+			else
+			{
+				this.ViewData.Add("PortfolioName", clientPortfolio.Name);
+				this.ViewData.Add("OrderId", UriHelper.GetIdFromLocationUri(httpResponseMessage.Headers.Location));
 
+				return this.View("/Views/Order/PlanModify.cshtml");
 			}
 		}
 

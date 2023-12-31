@@ -5,6 +5,7 @@ namespace Descartes.Wms2.HowToUse.Mvc.Models
 	public class PlanChangeProposalSelectionViewModel
 	{
 		public long PortfolioId { get; set; }
+		public string PortfolioName { get; set;	 }	
 		public long ClientId { get; set; }
 		public long ProposalId { get; set; }
 

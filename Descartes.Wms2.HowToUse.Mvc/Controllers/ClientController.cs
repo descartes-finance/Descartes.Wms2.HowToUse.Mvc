@@ -1,7 +1,13 @@
-﻿using Descartes.Wms2.HowToUse.Mvc.Extensions;
+﻿using System.Net.Http.Headers;
+using System.Text;
+
+using Descartes.Wms2.HowToUse.Mvc.Extensions;
 using Descartes.Wms2.HowToUse.Mvc.Models;
+using Descartes.Wms2.HowToUse.Mvc.Shared.DTOs;
 
 using Microsoft.AspNetCore.Mvc;
+
+using Newtonsoft.Json;
 
 namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 {
@@ -26,6 +32,91 @@ namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 #endif
 
 			return this.View("/Views/Client/GetClientId.cshtml", viewModel);
+		}
+
+		[HttpGet]
+		[ResponseCache(NoStore = true, Duration = 0)]
+
+		[HttpPost]
+		public IActionResult UpdateClientAddress(
+			string street,
+			string streetNr,
+			string city,
+			string zip,
+			long countryId)
+		{
+			using var httpClient = new HttpClient { BaseAddress = new Uri(_configuration["WmsBaseUrl"]) };
+			httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json", 1));
+			httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("de-DE", 1));
+			httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.HttpContext.Session.Get<string>("Token"));
+
+			var userAddressInputModel = new
+			{
+				Street = street,
+				StreetNr = streetNr,
+				City = city,
+				CountryId = countryId,
+				Zip = zip
+			};
+
+			var userId = this.HttpContext.Session.Get<long>("ClientId");
+			var userAddressInputModelAsString = JsonConvert.SerializeObject(userAddressInputModel);
+			_ = httpClient.PutAsync($"api/v1/users/update-address/user-id/{userId}", new StringContent(userAddressInputModelAsString, Encoding.UTF8, "application/json")).Result;
+
+			var clientData = httpClient.GetFromJsonAsync<ClientOutputModel>($"api/v1/users/{userId}").Result;
+
+			return this.View("/Views/Client/UpdateAddress.cshtml", clientData);
+		}
+
+		[HttpPost]
+		public IActionResult UpdateClient(
+			long genderId,
+			string name,
+			string surname,
+			string phoneNumberPrefix,
+			string phoneNumberNumber,
+			string email,
+			DateTime birthDate,
+			long civilStatusId,
+			DateTime? civilStatusDate,
+			long languageId,
+			long nationalityId,
+			bool deliverTaxStatement,
+			long taxLiaabilityId,
+			long workSituationId,
+			long pensionSituationId)
+		{
+			using var httpClient = new HttpClient { BaseAddress = new Uri(_configuration["WmsBaseUrl"]) };
+			httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json", 1));
+			httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("de-DE", 1));
+			httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.HttpContext.Session.Get<string>("Token"));
+
+			var clientUpdateInputModel = new
+			{
+				Name = name,
+				Surname = surname,
+				Email = email,
+				PhoneNumberPrefix = phoneNumberPrefix,
+				PhoneNumberNumber = phoneNumberNumber,
+				BirthDate = birthDate,
+				CivilStatusId = civilStatusId,
+				CivilStatusDate = civilStatusDate,
+				GenderId = genderId,
+				LanguageId = languageId,
+				Nationality1Id = nationalityId,
+				DeliverTaxStatement = deliverTaxStatement,
+				TaxLiabilityId = taxLiaabilityId,
+				WorkSituationId = workSituationId,
+				PensionSituationId = pensionSituationId
+			};
+	
+			var userId = this.HttpContext.Session.Get<long>("ClientId");
+			var clientUpdateInputModelAsString = JsonConvert.SerializeObject(clientUpdateInputModel);
+			_ = httpClient.PutAsync($"api/v1/users/user-id/{userId}", new StringContent(clientUpdateInputModelAsString, Encoding.UTF8, "application/json")).Result;
+
+			var clientData = httpClient.GetFromJsonAsync<ClientOutputModel>($"api/v1/users/{userId}").Result;
+
+			return this.View("/Views/Client/Update.cshtml", clientData);
 		}
 
 		[HttpPost]
