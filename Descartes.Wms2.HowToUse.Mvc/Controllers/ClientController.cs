@@ -98,6 +98,7 @@ namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 				Email = email,
 				PhoneNumberPrefix = phoneNumberPrefix,
 				PhoneNumberNumber = phoneNumberNumber,
+				Url = "https://webhook.site/630f822b-53b5-4de2-afc6-85876c8d4abf",
 				BirthDate = birthDate,
 				CivilStatusId = civilStatusId,
 				CivilStatusDate = civilStatusDate,
@@ -109,7 +110,7 @@ namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 				WorkSituationId = workSituationId,
 				PensionSituationId = pensionSituationId
 			};
-	
+
 			var userId = this.HttpContext.Session.Get<long>("ClientId");
 			var clientUpdateInputModelAsString = JsonConvert.SerializeObject(clientUpdateInputModel);
 			_ = httpClient.PutAsync($"api/v1/users/user-id/{userId}", new StringContent(clientUpdateInputModelAsString, Encoding.UTF8, "application/json")).Result;

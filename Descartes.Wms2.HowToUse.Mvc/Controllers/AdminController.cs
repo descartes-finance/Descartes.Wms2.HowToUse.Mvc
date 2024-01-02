@@ -134,5 +134,43 @@ namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 
 			return this.View("/Views/Admin/CreateClient.cshtml", viewModel);
 		}
+
+		[HttpGet]
+		public async Task<IActionResult> SubscribeForOrderSubmissionSystemOccurrence(long adminUserId)
+		{
+			using var httpClient = new HttpClient { BaseAddress = new Uri(_configuration["WmsBaseUrl"]) };
+			httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json", 1));
+			httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("de-DE", 1));
+			httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _configuration["GuestToken"]);
+
+			var systemOccurrences = await httpClient.GetFromJsonAsync<List<SystemOccurenceOutputModel>>("api/v1/system-occurence");
+
+			return this.View("/Views/Admin/SubscribeForSystemOccurrence.cshtml", new SubscribeToSystemOccurenceViewModel { SystemOccurences = systemOccurrences, AdminUserId = adminUserId });
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> SubscribeForOrderSubmissionSystemOccurrenceUpdate(SubscribeToSystemOccurenceViewModel viewModel)
+		{
+			using var httpClient = new HttpClient { BaseAddress = new Uri(_configuration["WmsBaseUrl"]) };
+			httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json", 1));
+			httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("de-DE", 1));
+			httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _configuration["SuperAdminToken"]);
+
+			var selected = viewModel.Selected.Select(x => new SystemOccurencePreferenceInputModel
+			{
+				Id = x,
+				IsEmailEnabled = false,
+				IsHttpEnabled = true,
+				IsSmsEnabled = false
+			}).ToList();
+
+			var payLoadAsString = JsonConvert.SerializeObject(selected);
+			await httpClient.PostAsync($"api/v1/system-occurence/user/{viewModel.AdminUserId}", new StringContent(payLoadAsString, Encoding.UTF8, "application/json"));
+
+			var admintData = await httpClient.GetFromJsonAsync<ClientOutputModel>($"api/v1/users/{viewModel.AdminUserId}");
+			var systemOccurrences = await httpClient.GetFromJsonAsync<List<SystemOccurenceOutputModel>>("api/v1/system-occurence");
+
+			return this.View("/Views/Admin/SubscribeForSystemOccurrence.cshtml", new SubscribeToSystemOccurenceViewModel { SystemOccurences = systemOccurrences, Selected = viewModel.Selected, Admin = admintData });
+		}
 	}
 }

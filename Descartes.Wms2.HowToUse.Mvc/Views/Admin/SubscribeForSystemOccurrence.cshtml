@@ -1,0 +1,90 @@
+﻿@using Descartes.Wms2.HowToUse.Mvc.Shared.DTOs;
+@using System.Net.Http.Headers;
+@inject IConfiguration Configuration
+
+@{
+	this.ViewData["Title"] = "Subscription";
+
+	var firstSelected = false;
+}
+
+@model SubscribeToSystemOccurenceViewModel
+
+@if (this.Model.Selected == null || !this.Model.Selected.Any())
+{
+	<div class="text-center">
+		<header class="bg-white border-bottom box-shadow mb-3">
+			<h1 class="display-4">Subscription</h1>
+		</header>
+
+		<form method="POST" action="/Admin/SubscribeForOrderSubmissionSystemOccurrenceUpdate">
+			@Html.HiddenFor(x => x.AdminUserId)
+
+			<div class="row">
+				@foreach (var occurrence in this.Model.SystemOccurences)
+				{
+					@if (!firstSelected)
+					{
+						firstSelected = true;
+
+						<div class="col-md-12">
+							<input type="checkbox" name="Selected" value="@occurrence.Id" checked /> @occurrence.Code
+						</div>
+					}
+					else
+					{
+						<div class="col-md-12">
+							<input type="checkbox" name="Selected" value="@occurrence.Id" /> @occurrence.Code
+						</div>
+					}
+				}
+			</div>
+
+			<br />
+
+			<div class="row align-content-center">
+				<div class="col-md-12">
+					<a href="/ClientPosition/PortfoliosList" class="btn btn-primary">Back to list</a>
+					<input type="submit" class="btn btn-primary" value="Subscribe" />
+				</div>
+			</div>
+		</form>
+	</div>
+}
+else
+{
+	<div class="text-center">
+		<header class="bg-white border-bottom box-shadow mb-3">
+			<h1 class="display-4">Subscription Confirmation</h1>
+		</header>
+
+		<div class="row align-content-center">
+			<div class="col-md-12">
+				Admin <b> @this.Model.Admin.Surname</b> has been subsccribed for system events:
+			</div>
+		</div>
+
+		<br />
+
+		<div class="row align-content-center">
+			<div class="col-md-12">
+				@foreach (var occurrence in this.Model.SystemOccurences)
+				{
+					@if (this.Model.Selected.Contains(occurrence.Id))
+					{
+						@occurrence.Code
+
+						<br />
+					}
+				}
+			</div>
+		</div>
+
+		<br />
+		<div class="row align-content-center">
+			<div class="col-md-12">
+				<a href="/home/index">Back to home</a>
+			</div>
+		</div>
+	</div>
+}

@@ -1,0 +1,19 @@
+﻿@{
+	ViewData["Title"] = "Admin Created";
+}
+
+@model SuperAdminViewModel
+
+<div class="text-center">
+	<header class="bg-white border-bottom box-shadow mb-3">
+		<h1 class="display-4">Admin Creation</h1>
+	</header>
+
+	<div>Super Admin with name <b>@this.Model.Name</b> and surname <b>@this.Model.Name</b> created.</div>
+	
+	<br/>
+	
+	<div>
+		<a href="/Admin/SubscribeForOrderSubmissionSystemOccurrence?adminUserId=@(this.Model.Id)" class="btn btn-primary">Subscribe for HTTP call back</a>
+	</div>
+</div>
