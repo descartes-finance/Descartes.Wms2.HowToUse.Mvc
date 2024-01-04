@@ -162,16 +162,14 @@ else
 
 			<div class="col-12">
 				<div style="color: red">
-					<ul>
-						@if (this.ViewData.Keys.Contains("ApiError"))
+					@if (this.ViewData.Keys.Contains("ApiError"))
+					{
+						var apiErrors = this.ViewData["ApiError"] as Dictionary<string, string>;
+						foreach (var validationError in apiErrors)
 						{
-							var apiErrors = this.ViewData["ApiError"] as Dictionary<string, string>;
-							foreach (var validationError in apiErrors)
-							{
-								<li>@validationError.Key: @validationError.Value</li>
-							}
+							<div>@validationError.Key: @validationError.Value</div>
 						}
-					</ul>
+					}
 				</div>
 			</div>
 
