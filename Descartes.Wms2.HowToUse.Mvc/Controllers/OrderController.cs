@@ -1,7 +1,4 @@
-﻿using System.Net.Http.Headers;
-using System.Text;
-
-using Descartes.Wms2.HowToUse.Mvc.Extensions;
+﻿using Descartes.Wms2.HowToUse.Mvc.Extensions;
 using Descartes.Wms2.HowToUse.Mvc.Helpers;
 using Descartes.Wms2.HowToUse.Mvc.Models;
 using Descartes.Wms2.HowToUse.Mvc.Shared.DTOs;
@@ -10,6 +7,9 @@ using Descartes.Wms2.HowToUse.Mvc.Shared.DTOs.Errors;
 using Microsoft.AspNetCore.Mvc;
 
 using Newtonsoft.Json;
+
+using System.Net.Http.Headers;
+using System.Text;
 
 namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 {
@@ -94,7 +94,7 @@ namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 				ReasonToChangeProposalResponsesIds = default(List<long>) // In case user agreed with suggested proposal, this list can be left empty
 			};
 
-			var httpContent = HttpHelper.CreateMultipartFormDataHttpContent(orderPortfolioCreationInputModel, Convert.FromBase64String(orderViewModel.Document));
+			var httpContent = HttpHelper.CreateMultipartFormDataHttpContent(orderPortfolioCreationInputModel, Convert.FromBase64String(orderViewModel.Document), "UserContracts");
 			httpResponseMessage = httpClient.PostAsync("api/v1/user-portfolio-orders/creation", httpContent).Result;
 			if (httpResponseMessage.IsSuccessStatusCode == false)
 			{
@@ -166,7 +166,7 @@ namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 			// 1.a new PDF document is needed for plan change. For this example we simply use an empty PDF.
 			// 2.reason to change proposal is hard-coded while should be choosen by client
 			//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			
+
 			var clientPortfolio = await httpClient.GetFromJsonAsync<PortfolioOutputModel>($"api/v1/user-portfolios/portfolio-id/{planChangeProposalSelectionViewModel.PortfolioId}?portfolio-view-as=Snapshot");
 
 			var reasonToChangeProposalUrl = $"api/v1/reason-to-change-proposed-proposal/investment-category-id/{clientPortfolio.InvestmentCategoryId}/active";
@@ -184,7 +184,7 @@ namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 			// For simplicity, use an empty PDF contract template
 			var byteArray = FileContentHelper.GetFileContent(this.GetType(), "Contract-3A.pdf");
 
-			var httpContent = HttpHelper.CreateMultipartFormDataHttpContent(orderPortfolioModificationInputModel, byteArray);
+			var httpContent = HttpHelper.CreateMultipartFormDataHttpContent(orderPortfolioModificationInputModel, byteArray, "UserContracts");
 			var httpResponseMessage = httpClient.PostAsync("api/v1/user-portfolio-orders/modification", httpContent).Result;
 			if (httpResponseMessage.IsSuccessStatusCode == false)
 			{
@@ -232,7 +232,7 @@ namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 			httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("de-DE", 1));
 			httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", this.HttpContext.Session.Get<string>("Token"));
 
-			var httpContent = HttpHelper.CreateMultipartFormDataHttpContent(payload, byteArray);
+			var httpContent = HttpHelper.CreateMultipartFormDataHttpContent(payload, byteArray, "Attachments");
 			var httpResponseMessage = await httpClient.PostAsync("api/v1/pdf-service/fill-pdf-with-data", httpContent);
 			if (httpResponseMessage.IsSuccessStatusCode)
 			{

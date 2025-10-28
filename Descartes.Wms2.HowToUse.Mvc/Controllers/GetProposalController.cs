@@ -1,10 +1,10 @@
-﻿using System.Net.Http.Headers;
-
-using Descartes.Wms2.HowToUse.Mvc.Extensions;
+﻿using Descartes.Wms2.HowToUse.Mvc.Extensions;
 using Descartes.Wms2.HowToUse.Mvc.Models;
 using Descartes.Wms2.HowToUse.Mvc.Shared.DTOs;
 
 using Microsoft.AspNetCore.Mvc;
+
+using System.Net.Http.Headers;
 
 namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 {
@@ -51,12 +51,12 @@ namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 				}
 			}
 
-			var responses = clientQuestionnaireOutputModel != null 
+			var responses = clientQuestionnaireOutputModel != null
 				? clientQuestionnaireOutputModel.Responses.Select(x => new CustomerQuestionnaireResponse { QuestionnaireResponseId = x.QuestionnaireResponseId }).ToList()
 				: null;
 
 #if DEBUG
-			if (responses == null || responses.Any())
+			if (responses == null || !responses.Any())
 			{
 				responses = new List<CustomerQuestionnaireResponse>
 				{
@@ -68,8 +68,8 @@ namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 			}
 #endif
 
-            // Prepare the view model with questionnaire questions and client responses if presents.
-            var viewModel = new RiskProfileCreateOrUpdateViewModel
+			// Prepare the view model with questionnaire questions and client responses if presents.
+			var viewModel = new RiskProfileCreateOrUpdateViewModel
 			{
 				BusinessLineId = businessLineVorsorge.Id,
 				InvestmentCategoryId = investmentCategory3A.Id,
@@ -126,14 +126,14 @@ namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 
 			var riskCategorizazionId = riskCategorizationOutputModel.Id;
 			this.HttpContext.Session.Set<long>("ClientRiskId", riskCategorizazionId);
-            this.HttpContext.Session.Set<long>("BusinessLineId", riskProfileViewModel.BusinessLineId.Value);
-            this.HttpContext.Session.Set<long>("InvestmentCategoryId", riskProfileViewModel.InvestmentCategoryId.Value);
-            this.HttpContext.Session.Set<long>("Response1Id", long.Parse(riskProfileViewModel.Responses.ElementAt(0)));
-            this.HttpContext.Session.Set<long>("Response2Id", long.Parse(riskProfileViewModel.Responses.ElementAt(1)));
-            this.HttpContext.Session.Set<long>("Response3Id", long.Parse(riskProfileViewModel.Responses.ElementAt(2)));
-            this.HttpContext.Session.Set<long>("Response4Id", long.Parse(riskProfileViewModel.Responses.ElementAt(3)));
+			this.HttpContext.Session.Set<long>("BusinessLineId", riskProfileViewModel.BusinessLineId.Value);
+			this.HttpContext.Session.Set<long>("InvestmentCategoryId", riskProfileViewModel.InvestmentCategoryId.Value);
+			this.HttpContext.Session.Set<long>("Response1Id", long.Parse(riskProfileViewModel.Responses.ElementAt(0)));
+			this.HttpContext.Session.Set<long>("Response2Id", long.Parse(riskProfileViewModel.Responses.ElementAt(1)));
+			this.HttpContext.Session.Set<long>("Response3Id", long.Parse(riskProfileViewModel.Responses.ElementAt(2)));
+			this.HttpContext.Session.Set<long>("Response4Id", long.Parse(riskProfileViewModel.Responses.ElementAt(3)));
 
-            return this.LocalRedirect("/GetProposal/ShowProposal");
+			return this.LocalRedirect("/GetProposal/ShowProposal");
 		}
 
 		[HttpGet]

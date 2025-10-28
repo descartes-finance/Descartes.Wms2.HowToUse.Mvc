@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net9.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Content Include="appsettings.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	  </Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Pdf\Contract-3A.pdf" LogicalName="Contract-3A.pdf">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Descartes.Wms2.HowToUse.Mvc.Helpers\Descartes.Wms2.HowToUse.Mvc.Helpers.csproj" />
+		<ProjectReference Include="..\Descartes.Wms2.HowToUse.Mvc.Shared.DTOs\Descartes.Wms2.HowToUse.Mvc.Shared.DTOs.csproj" />
+		<ProjectReference Include="..\Descartes.Wms2.HowToUse.Mvc\Descartes.Wms2.HowToUse.Mvc.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="9.0.5" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	</ItemGroup>	
+</Project>

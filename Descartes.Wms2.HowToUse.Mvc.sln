@@ -13,6 +13,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00 Common", "00 Common", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Descartes.Wms2.HowToUse.Mvc.Helpers", "Descartes.Wms2.HowToUse.Mvc.Helpers\Descartes.Wms2.HowToUse.Mvc.Helpers.csproj", "{13060ED2-9E51-41BC-9FF5-D3A9FA7383D9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02 Console App", "02 Console App", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Descartes.Wms2.HowToUse", "Descartes.Wms2.HowToUse\Descartes.Wms2.HowToUse.csproj", "{3B48C11F-3245-4CB8-BFFD-DFD1DECC9AEC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +35,10 @@ Global
 		{13060ED2-9E51-41BC-9FF5-D3A9FA7383D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13060ED2-9E51-41BC-9FF5-D3A9FA7383D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13060ED2-9E51-41BC-9FF5-D3A9FA7383D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B48C11F-3245-4CB8-BFFD-DFD1DECC9AEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B48C11F-3245-4CB8-BFFD-DFD1DECC9AEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B48C11F-3245-4CB8-BFFD-DFD1DECC9AEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B48C11F-3245-4CB8-BFFD-DFD1DECC9AEC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -39,6 +47,7 @@ Global
 		{F111B8BF-22D1-4C68-A002-A8FBECB127EA} = {4CF7C157-94C4-49C8-82B2-48339D444C21}
 		{9B6CD49B-34DE-4A83-8A63-AB3F1026DA4F} = {3D978AD5-D827-4396-A278-735A69940EB0}
 		{13060ED2-9E51-41BC-9FF5-D3A9FA7383D9} = {3D978AD5-D827-4396-A278-735A69940EB0}
+		{3B48C11F-3245-4CB8-BFFD-DFD1DECC9AEC} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D58A909F-C39E-497A-8154-3258150C865F}
