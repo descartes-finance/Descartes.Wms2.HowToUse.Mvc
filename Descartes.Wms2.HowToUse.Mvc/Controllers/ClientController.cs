@@ -28,7 +28,7 @@ namespace Descartes.Wms2.HowToUse.Mvc.Controllers
 #if DEBUG
 
 			viewModel.ClientId = 226;
-			viewModel.Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwcmltYXJ5Z3JvdXBzaWQiOiJERVNDQVJURVMiLCJuYW1laWQiOiIxIiwidW5pcXVlX25hbWUiOiIxIiwiZ2l2ZW5fbmFtZSI6IkN1bG8iLCJmYW1pbHlfbmFtZSI6IlJvdHRvIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNjY0OTY1ODM3LCJleHAiOjIxMzgzNTE0MzcsImlhdCI6MTY2NDk2NTgzN30.MTyQ77tS5Y1c5Kw_7QmNohLSqMgD1mjj1M1BvaHcvEQ";
+			viewModel.Token = "XXXXXXXXXXXXXXXX";
 #endif
 
 			return this.View("/Views/Client/GetClientId.cshtml", viewModel);
